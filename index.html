@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head><title>DisChat</title></head>
+<style type="text/css">
+body
+{
+	background: #f4f4f4;
+}
+input
+{
+	height: 30px;
+}
+.top
+{
+	background: #00f;
+	width:100%;
+	color: #fff;
+	left: 0px;
+	height: 100px;
+	position: absolute;
+	top: 0px;
+}
+#before_main
+{
+	margin: auto;
+	width: 700px;
+	
+	border-radius: 20px;
+	padding: 30px;
+	color: #000;
+	margin-top: 100px;
+
+}
+#nameWrapper
+{
+
+}
+#userNameForm
+{
+
+}
+#username
+{
+
+}
+.user
+{
+	text-decoration: none;
+	color: #f00;
+}
+#after_main
+{
+	width: 100%;
+	
+	
+		display: none;
+		margin-top: 100px;
+
+
+}
+#chatContainer
+{
+
+	margin: auto;
+	width: 1000px;
+	height:700px;
+	
+
+}
+#chatWrapper
+{
+	width: 500px;
+	background: #fff;
+	height: 400px;
+
+	position: absolute;
+	bottom: 0px;
+	padding: 30px;
+	float: left;
+	overflow: scroll;
+}
+#chats
+{
+	height: 250px;
+	overflow: scroll;
+}
+#chatsMessage
+{
+	
+	}
+#chatForm
+{
+	position: absolute;
+	bottom:20px;
+	margin: 10px;
+	display: none;
+	
+}
+#usersWrapper
+{
+	position: absolute;
+	right: 0px;
+	top:100px;
+	margin-left: 3px;
+	background: #fff;
+	height: 100%;
+	width: 150px;
+	
+	padding: 5px;
+	
+}
+.align-center
+{
+	text-align: center;
+}
+#error
+{
+	color: #ff0;
+}
+#setTitle
+{
+margin: 20px;
+color: #00f;
+font-size: 25px;
+}
+
+#single_chat_wrapper
+{
+	width: 250px;
+	height: 350px;
+	background: #f4f4f4;
+	border:1px #00f solid;
+	position: absolute;
+	right: 10px;
+	bottom: 0px;
+	z-index: 15;
+	display: none;
+}
+#single_chat_heading
+{
+	text-align: center;
+	color: #f00;
+}
+#single_chat_body
+{
+padding: 5px;
+height: 200px;
+overflow-y: auto;
+}
+#single_chat_form
+{
+	position: absolute;
+	bottom:20px;
+	margin: 10px;
+	
+
+}
+.user
+{
+	text-decoration: none;
+	color: #f00;
+}
+#single_chat_with
+{
+	padding: 10px;
+	color: #fff;
+	background: #0000ff;
+}
+#single_chat_message_item
+{
+background: #fff;
+margin:5px;
+border-radius: 10px;
+padding: 3px;
+}
+#close
+{
+	float: right;
+	width: 20px;
+	height: 20px;
+	color: #0000ff;
+	background: #fff;
+	font-size: 15px;
+	vertical-align: middle;
+	text-align: center;
+	margin: 5px;
+}
+#minimise
+{
+	float: right;
+	color: #0000ff;
+		width: 20px;
+		text-align: center;
+		vertical-align: middle;
+	height: 20px;
+	font-size: 15px;
+	background: #fff;
+	margin: 5px;
+
+}
+</style>
+<body>
+
+	<div class="top"><h1 class="align-center"> DisChat</h1></div>
+
+	<div id="before_main">
+		<h2>Enter ur name to begin</h2>
+	<div id="nameWrapper">
+		<form id="userNameForm">
+			<input size="40" id="username">
+			<input type="submit" value="Submit">
+		</form>
+		<div id="error"></div>
+	</div>
+	</div>
+	<div id="after_main">
+		<div id="chatContainer">
+			<div id="hi"></div>
+		<div id ="chatWrapper">
+			<h3 class="align-center">Group Discussion</h3>
+			<div id="setTitle">
+				<div id="Disctitle"></div>
+				<form id="setTitleForm">
+				Change the title<br>
+				<input id="title" placeholder="Title" size="80%">
+				<input type="submit" value="Submit"> 
+		
+			</form>
+
+			</div>
+			<div id="chats">
+			
+			</div>
+
+			<form id="chatForm">
+			<input size="100%"  id="message" placeholder="Type message">
+			<input type="submit" value="Message" >
+			</form>
+			
+		</div>
+		
+	
+	</div>
+
+	<div id="usersWrapper">
+				<h3 class="align-center">Active Users</h3>
+				<div id="users">
+				</div>
+				
+		</div>
+
+
+
+		<div id="single_chat_wrapper">
+			<div id="close">X</div>
+			<div id="minimise">-</div>
+		
+			<div id="single_chat_with">
+			
+			</div>
+			<div id="single_chat_body"></div>
+			<form id="single_chat_form">
+				<input size="30"  placeholder="Type" id="single_chat_message">
+				<input type="submit" value="Message"> 
+			</form>
+		</div>
+	</div>
+			<!-- Client side-->
+		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+
+
+	<script type="text/javascript">
+
+	//write a jquery function
+
+	$(function()
+	{
+		//define jquery variables
+		var socket=io.connect();  // get socket
+		var $chatForm=$("#chatForm");
+		var $message=$("#message");
+		var $chats=$("#chats");
+		var $userNameForm=$("#userNameForm");
+		var $username=$("#username");
+		var $before_main=$("#before_main");
+		var $after_main=$("#after_main");
+		var $chatContainer=$("#chatContainer");
+		var $users=$("#users");
+
+		var $error=$("#error");
+
+		var $title=$("#title");
+		var $setTitleForm=$("#setTitleForm");
+		var $Disctitle=$("#Disctitle");
+		var $toChat;
+		var $single_chat_wrapper=$("#single_chat_wrapper");
+		var $single_chat_with=$("#single_chat_with");
+		var $single_chat_form=$("#single_chat_form");
+		var $single_chat_body=$("#single_chat_body");
+		var $single_chat_message=$("#single_chat_message");
+		var $myName;
+		var $from;
+		var $to;
+		var chatGoingOn=false;
+		var $hi=$("#hi");
+
+
+		$chatForm.submit(function(e)  // define submit function for chat form
+		{	e.preventDefault();
+
+			// send msg from client to server
+			socket.emit('send message',$message.val());
+
+			//now set message to null
+			$message.val('');
+
+		});
+
+		//get msg from server
+		socket.on('new message',function(data)
+		{		
+			// we get data in form of json from server , so here we get msg by typing data.msg
+			$chats.append("<div id='chatsMessage'>"+ data.username+": " +data.msg+"</div><br>");
+
+
+		});
+
+		//username work
+		//username entered
+		$userNameForm.submit(function(e)
+		{
+			e.preventDefault();
+
+			// emit username to server
+			$myName=$username.val();
+
+			socket.emit('new username',$username.val(),function(data)
+			{	//in this emit function we will also take a call back from server to check duplicacy of usernames
+
+				if(data)  // valid username
+				{
+					$("#before_main").hide();
+					$("#after_main").show();
+					$hi.html("<br><br> HI  "+$myName);
+
+				}
+				else
+				{
+					//show error
+					$error.html("Username already registered");
+				}
+
+			});
+		});
+
+		// get usernames
+		socket.on('usernames',function(data)
+		{
+			var html='';
+			for(i=0;i<data.length;i++)
+			{
+				if(data[i]!=$myName)
+				html+="<a class='user' href='#'>"+data[i]+"</a><br>";
+			}
+			$users.html(html);
+
+			// set click function for single chat
+		$(".user").click(function()
+			{
+				
+				$toChat=$(this).html();
+				//alert($toChat);
+
+				//check whether an old chat is going on or not
+				if(chatGoingOn)
+				{
+					alert("You have a chat going on .Click to continue");
+				}
+
+				// send the server the name of person for single chat
+
+				$single_chat_wrapper.show();
+				chatGoingOn=true;
+				socket.emit('singleUser',{from:$myName,to:$toChat});
+
+			});
+
+		});
+
+		// contacting server for single chat
+		$single_chat_form.submit(function(e)
+			{
+				e.preventDefault();
+
+
+				socket.emit('single chat message send',{msg:$single_chat_message.val(),from:$from,to:$to});
+
+
+
+				$single_chat_message.val('');
+
+
+
+			});
+
+		socket.on('single chat new message',function(data)
+		{
+
+			if($myName==$from || $myName==$to)
+			{
+
+			$single_chat_wrapper.show();	//show the chat wrapper 
+			$single_chat_body.html("<div id='single_chat_message_item'>"+data.name+" : "+data.msg+"</div>"+$single_chat_body.html());
+		}
+		
+		});
+
+		socket.on('chat_with_single_user',function(data)
+		{
+
+			
+			
+			//$single_chat_with.html(data+"<hr>");
+			$from=data.from;
+			$to=data.to;
+			if($myName==$from || $myName==$to)
+			{
+				$single_chat_body.html('');
+			$single_chat_with.html("Chat : " +$from +" & "+$to);
+
+		    }
+
+		});
+
+		// send the title
+		$setTitleForm.submit(function(e)
+		{
+			e.preventDefault();
+
+			socket.emit('new title',$title.val());  //send title to server
+
+			$title.val('');
+			
+
+		});
+
+
+		//set the title
+		socket.on('set title',function(data)
+		{
+			$Disctitle.html(data);
+			$setTitleForm.hide();
+			$chatForm.show();
+		
+		
+		});
+
+	//close chat box
+
+	$("#close").click(function()
+	{
+		$("#single_chat_wrapper").hide();
+	})
+
+	//minimise
+
+
+	});
+
+	</script>
+</body>
+
+</html>
